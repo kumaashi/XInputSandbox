@@ -1,6 +1,7 @@
 //
-//XInputSandbox 2020 @gyabo
+// XInputSandbox 2020 @gyabo
 //
+// ref:https://docs.microsoft.com/en-us/windows/win32/xinput/getting-started-with-xinput
 #include <stdio.h>
 #include <windows.h>
 #include <stdlib.h>
@@ -10,6 +11,9 @@
 #include <vector>
 #include <algorithm>
 #include <xinput.h>
+
+#define INTERVAL_VIBRATION_CTRL 4
+//#define _DEBUG_GAMEPAD_
 
 void xinput_ctrl_vibration(int index, int left = 0, int right = 0)
 {
@@ -24,49 +28,17 @@ void xinput_debug(int index, XINPUT_STATE & state)
 	auto & gpad = state.Gamepad;
 
 	printf("pktnum:%d, btn:0x%04X, LT:%d, RT:%d, stick:%d %d, %d %d\n",
-		state.dwPacketNumber,
-		gpad.wButtons,
-		gpad.bLeftTrigger,
-		gpad.bRightTrigger,
-		gpad.sThumbLX,
-		gpad.sThumbLY,
-		gpad.sThumbRX,
-		gpad.sThumbRY);
-	auto LT = gpad.bLeftTrigger;
-	auto RT = gpad.bRightTrigger;
+		state.dwPacketNumber, gpad.wButtons,
+		gpad.bLeftTrigger, gpad.bRightTrigger,
+		gpad.sThumbLX, gpad.sThumbLY, gpad.sThumbRX, gpad.sThumbRY);
+
 	static int count = 0;
 	count++;
-	if ( (count % 4) == 0)
+	if ( (count % INTERVAL_VIBRATION_CTRL) == 0) {
+		auto LT = gpad.bLeftTrigger;
+		auto RT = gpad.bRightTrigger;
 		xinput_ctrl_vibration(index, LT * LT, RT * RT);
-
-	if (gpad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
-		printf("XINPUT_GAMEPAD_DPAD_UP\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
-		printf("XINPUT_GAMEPAD_DPAD_DOWN\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
-		printf("XINPUT_GAMEPAD_DPAD_LEFT\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
-		printf("XINPUT_GAMEPAD_DPAD_RIGHT\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_START)
-		printf("XINPUT_GAMEPAD_START\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_BACK)
-		printf("XINPUT_GAMEPAD_BACK\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB)
-		printf("XINPUT_GAMEPAD_LEFT_THUMB\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
-		printf("XINPUT_GAMEPAD_RIGHT_THUMB\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-		printf("XINPUT_GAMEPAD_LEFT_SHOULDER\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
-		printf("XINPUT_GAMEPAD_RIGHT_SHOULDER\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_A)
-		printf("XINPUT_GAMEPAD_A\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_B)
-		printf("XINPUT_GAMEPAD_B\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_X)
-		printf("XINPUT_GAMEPAD_X\n");
-	if (gpad.wButtons & XINPUT_GAMEPAD_Y)
-		printf("XINPUT_GAMEPAD_Y\n");
+	}
 }
 
 void xinput_ctrl()

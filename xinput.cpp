@@ -27,7 +27,9 @@ void xinput_debug(int index, XINPUT_STATE & state)
 {
 	auto & gpad = state.Gamepad;
 
-	printf("pktnum:%d, btn:0x%04X, LT:%d, RT:%d, stick:%d %d, %d %d\n",
+
+	//Get input info.
+	printf("pktnum:%d, btn:0x%04X, LT:%d, RT:%d, stick:%d %d, %d %d\r",
 		state.dwPacketNumber, gpad.wButtons,
 		gpad.bLeftTrigger, gpad.bRightTrigger,
 		gpad.sThumbLX, gpad.sThumbLY, gpad.sThumbRX, gpad.sThumbRY);
@@ -39,6 +41,7 @@ void xinput_debug(int index, XINPUT_STATE & state)
 		auto RT = gpad.bRightTrigger;
 		xinput_ctrl_vibration(index, LT * LT, RT * RT);
 	}
+
 }
 
 void xinput_ctrl()
@@ -52,10 +55,37 @@ void xinput_ctrl()
 	}
 }
 
+void xinput_ctrl_get_battery_info() {
+	printf("============================\n");
+	for (DWORD i = 0; i < XUSER_MAX_COUNT; i++ ) {
+		printf("dev-%d:", i);
+		//Get Battery info.
+		XINPUT_BATTERY_INFORMATION batinfo = {};
+		XInputGetBatteryInformation(i, BATTERY_DEVTYPE_GAMEPAD, &batinfo);
+		if(batinfo.BatteryType == BATTERY_TYPE_DISCONNECTED) {
+			printf("BATTERY_TYPE_DISCONNECTED	The device is not connected.\n");
+			continue;
+		}
+		if(batinfo.BatteryType == BATTERY_TYPE_WIRED)
+			printf("BATTERY_TYPE_WIRED	The device is a wired device and does not have a battery.\n");
+		if(batinfo.BatteryType == BATTERY_TYPE_ALKALINE)
+			printf("BATTERY_TYPE_ALKALINE	The device has an alkaline battery.\n");
+		if(batinfo.BatteryType == BATTERY_TYPE_NIMH)
+			printf("BATTERY_TYPE_NIMH	The device has a nickel metal hydride battery.\n");
+		if(batinfo.BatteryType == BATTERY_TYPE_UNKNOWN)
+			printf("BATTERY_TYPE_UNKNOWN	The device has an unknown battery type.\n");
+	}
+}
+
 int main()
 {
+	int count = 0;
 	while ((GetAsyncKeyState(VK_ESCAPE) & 0x8000) == 0) {
 		xinput_ctrl();
+		count++;
+		if ( (count % 60) == 0)
+			xinput_ctrl_get_battery_info();
+
 		Sleep(16);
 	}
 	return 0;

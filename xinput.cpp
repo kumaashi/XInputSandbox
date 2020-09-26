@@ -29,7 +29,8 @@ void xinput_debug(int index, XINPUT_STATE & state)
 
 
 	//Get input info.
-	printf("pktnum:%d, btn:0x%04X, LT:%d, RT:%d, stick:%d %d, %d %d\r",
+	printf("dev-%d:pktnum:%d, btn:0x%04X, LT:%d, RT:%d, stick:%d %d, %d %d\r",
+		index,
 		state.dwPacketNumber, gpad.wButtons,
 		gpad.bLeftTrigger, gpad.bRightTrigger,
 		gpad.sThumbLX, gpad.sThumbLY, gpad.sThumbRX, gpad.sThumbRY);
@@ -56,9 +57,10 @@ void xinput_ctrl()
 }
 
 void xinput_ctrl_get_battery_info() {
-	printf("============================\n");
+	printf("\n\n============================\n");
 	for (DWORD i = 0; i < XUSER_MAX_COUNT; i++ ) {
 		printf("dev-%d:", i);
+
 		//Get Battery info.
 		XINPUT_BATTERY_INFORMATION batinfo = {};
 		XInputGetBatteryInformation(i, BATTERY_DEVTYPE_GAMEPAD, &batinfo);
@@ -75,6 +77,7 @@ void xinput_ctrl_get_battery_info() {
 		if(batinfo.BatteryType == BATTERY_TYPE_UNKNOWN)
 			printf("BATTERY_TYPE_UNKNOWN	The device has an unknown battery type.\n");
 	}
+	printf("============================\n");
 }
 
 int main()
